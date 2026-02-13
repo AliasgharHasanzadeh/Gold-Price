@@ -7,8 +7,14 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   margin: 0;
+  padding: 0;
   font-family: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   background: radial-gradient(circle at top left, #1b2838, #050816);
@@ -17,6 +23,8 @@ body {
   display: flex;
   flex-direction: column;
   line-height: 1.5;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* ---------------------------------------------------------
@@ -44,9 +52,9 @@ body {
 
 .app-header h1 {
   margin: 0;
-  font-size: clamp(1.2rem, 4vw, 1.6rem); /* فونت متغیر بر اساس عرض صفحه */
+  font-size: clamp(1.1rem, 4vw, 1.6rem); /* فونت متغیر بر اساس عرض صفحه */
   font-weight: 700;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 .subtitle {
@@ -94,9 +102,9 @@ body {
 /* سیستم گرید پیشرفته - بدون نیاز به مدیا کوئری سخت */
 .cards-container {
   display: grid;
-  /* کارت‌ها حداقل ۲۸۰ پیکسل فضا میگیرند، اگر جا بود کش می‌آیند */
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 /* ---------------------------------------------------------
@@ -167,6 +175,8 @@ body {
   align-items: baseline;
   gap: 0.4rem;
   margin-top: 0.25rem;
+  flex-wrap: wrap;
+  word-break: break-word;
 }
 
 .price-value {
@@ -175,6 +185,8 @@ body {
   color: #facc15; /* رنگ طلایی */
   line-height: 1;
   text-shadow: 0 0 20px rgba(250, 204, 21, 0.15);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .price-unit {
@@ -191,6 +203,8 @@ body {
   margin-top: auto; /* چسباندن به پایین کارت */
   padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .status {
@@ -303,50 +317,193 @@ body {
 /* ---------------------------------------------------------
    MEDIA QUERIES (تنظیمات مخصوص موبایل)
 --------------------------------------------------------- */
-@media (max-width: 768px) {
+
+/* تبلت کوچک و موبایل بزرگ (تا 768px) */
+@media screen and (max-width: 768px) {
   .app-header {
     flex-direction: column;
-    align-items: stretch; /* کشیدن آیتم‌ها تا کل عرض را بگیرند */
+    align-items: stretch;
     text-align: center;
-    padding: 1rem 1.25rem;
-    gap: 1rem;
+    padding: 1rem;
+    gap: 0.875rem;
   }
   
   .app-header h1 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    white-space: normal;
   }
 
   .header-actions {
     width: 100%;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.625rem;
   }
   
   .subtitle {
-    display: none; /* در موبایل توضیحات اضافه را مخفی کن تا خلوت شود */
+    display: none;
   }
 
   .btn {
-    width: 100%; /* دکمه تمام عرض */
-    padding: 0.8rem; /* دکمه بزرگتر برای انگشت */
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .last-updated {
+    font-size: 0.75rem;
+    text-align: center;
+    width: 100%;
   }
 
   .main-content {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 1rem;
+    width: 100%;
+    max-width: 100%;
   }
 
-  /* نکته مهم: این خط باعث می‌شود کارت‌ها تک‌ستونه شوند */
+  .section-title {
+    font-size: 1rem;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
   .cards-container {
-    grid-template-columns: 1fr !important; /* اجبار به یک ستون */
-    gap: 1.2rem;
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+    width: 100%;
   }
   
   .card {
-    padding: 1.2rem;
+    padding: 1rem;
+    width: 100%;
+    min-width: 0;
   }
   
-  /* کمی کوچک کردن فونت قیمت در گوشی تا بیرون نزند */
   .price-value {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+  }
+
+  .card-exchange-name {
+    font-size: 0.95rem;
+  }
+
+  .meta-row {
+    font-size: 0.7rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .info-section {
+    padding: 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* موبایل کوچک (تا 480px) */
+@media screen and (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .app-header {
+    padding: 0.875rem 0.75rem;
+    gap: 0.75rem;
+  }
+  
+  .app-header h1 {
+    font-size: 1.15rem;
+  }
+
+  .main-content {
+    padding: 1rem 0.75rem;
+  }
+
+  .section-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .cards-container {
+    gap: 0.875rem;
+  }
+  
+  .card {
+    padding: 0.875rem;
+    border-radius: 0.75rem;
+  }
+
+  .card-exchange-name {
+    font-size: 0.9rem;
+  }
+
+  .price-value {
+    font-size: 1.35rem;
+  }
+
+  .price-unit {
+    font-size: 0.8rem;
+  }
+
+  .meta-row {
+    font-size: 0.65rem;
+    padding-top: 0.625rem;
+  }
+
+  .status {
+    padding: 3px 6px;
+  }
+
+  .timestamps {
+    font-size: 0.65rem;
+  }
+
+  .btn {
+    padding: 0.7rem 0.875rem;
+    font-size: 0.85rem;
+  }
+
+  .last-updated {
+    font-size: 0.7rem;
+  }
+
+  .info-section {
+    padding: 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  .loading,
+  .error-text {
+    font-size: 0.75rem;
+  }
+}
+
+/* موبایل خیلی کوچک (تا 360px) */
+@media screen and (max-width: 360px) {
+  .app-header {
+    padding: 0.75rem 0.625rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.05rem;
+  }
+
+  .main-content {
+    padding: 0.875rem 0.625rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+  }
+
+  .price-value {
+    font-size: 1.25rem;
+  }
+
+  .card-exchange-name {
+    font-size: 0.85rem;
+  }
+
+  .meta-row {
+    font-size: 0.6rem;
   }
 }
