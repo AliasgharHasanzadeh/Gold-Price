@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>داشبورد قیمت طلا</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>داشبورد قیمت طلا</h1>
+        <p class="subtitle">
+          نمایش زنده قیمت طلا از صرافی‌های مختلف
+        </p>
+      </div>
+      <div class="header-actions">
+        <button id="refresh-btn" class="btn primary">بروزرسانی دستی</button>
+        <span id="last-updated" class="last-updated">
+          آخرین بروزرسانی: —
+        </span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="cards-section">
+        <h2 class="section-title">لیست صرافی‌ها</h2>
+        <div id="cards-container" class="cards-container">
+          <!-- کارت‌ها به صورت داینامیک با JS ساخته می‌شوند -->
+        </div>
+      </section>
+
+      <section class="info-section">
+        <h2 class="section-title">توضیحات</h2>
+        <ul>
+          <li>قیمت‌ها به‌صورت مستقیم از API هر صرافی خوانده می‌شود.</li>
+          <li>برای اضافه کردن صرافی جدید، فقط کافی است در فایل <code>app.js</code> یک منبع جدید به آرایه‌ی منابع اضافه کنید.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>ساخته شده برای نمایش قیمت طلا (نمونه آموزشی)</span>
+    </footer>
+    
+    <script src="app.js"></script>
+  </body>
+</html>
+
