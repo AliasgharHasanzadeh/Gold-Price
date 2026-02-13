@@ -94,7 +94,7 @@ const sources = [
         if (!data || (data.code != 0 && data.code != 200) || !data.data) {
           throw new Error(`پاسخ نامعتبر از سرور (Code: ${data?.code})`);
         }
-        let rawPrice = data.data.price18 + '00';
+        let rawPrice = data.data.price18 + "00";
         if (typeof rawPrice === "string") rawPrice = rawPrice.replace(/,/g, "").trim();
         return {
           price: Number(rawPrice),
@@ -271,4 +271,5 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
 
