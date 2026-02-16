@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart.js Visualization</title>
+    <style>
+        :root {
+            /* پالت تیره + طلایی */
+            --bg-page: #0F172A;
+            --bg-card: linear-gradient(145deg, #1E293B 0%, #0F172A 100%);
+            --bg-card-hover: linear-gradient(145deg, #243047 0%, #1E293B 100%);
+            --gold: #FACC15;
+            --gold-soft: rgba(250, 204, 21, 0.15);
+            --gold-muted: #FDE047;
+            --text-primary: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border: rgba(248, 250, 252, 0.08);
+            --high: #34D399;
+            --low: #F87171;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(250, 204, 21, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-page);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+            max-width: 800px;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(250, 204, 21, 0.2);
+        }
+
+        .chart-title {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .current-price-wrap {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: var(--gold-soft);
+            border-radius: 14px;
+            border: 1px solid rgba(250, 204, 21, 0.25);
+        }
+
+        .current-price-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .current-price-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: -0.02em;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        canvas {
+            max-height: 100%;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            padding: 16px 12px;
+            background: var(--gold-soft);
+            border-radius: 12px;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-value.high {
+            color: var(--high);
+        }
+
+        .stat-value.low {
+            color: var(--low);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-muted);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .loading::before {
+            content: '';
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--gold-soft);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: var(--low);
+            font-size: 15px;
+            background: rgba(248, 113, 113, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                padding: 20px;
+            }
+
+            .chart-title {
+                font-size: 18px;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+
+            .stats-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            .stat-item {
+                padding: 14px;
+            }
+
+            .current-price-value {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <h1 class="chart-title">نمودار قیمت طلا (ساعتی)</h1>
+        <div id="currentPriceWrap" class="current-price-wrap" style="display: none;">
+            <div class="current-price-label">قیمت حال حاضر</div>
+            <div class="current-price-value" id="currentPrice">-</div>
+        </div>
+        <div id="loading" class="loading">در حال بارگذاری داده‌ها...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div class="chart-wrapper" style="display: none;">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div class="stats-container" id="statsContainer" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-label">کف قیمت روزانه</div>
+                <div class="stat-value low" id="lowPrice">-</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">سقف قیمت روزانه</div>
+                <div class="stat-value high" id="highPrice">-</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">تغییرات</div>
+                <div class="stat-value" id="change">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let myChart = null;
+
+        // تابع برای فرمت کردن اعداد با کاما
+        function formatNumber(num) {
+            return new Intl.NumberFormat('fa-IR').format(Math.round(num));
+        }
+
+        // تابع برای فرمت کردن تاریخ
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // تابع برای فرمت کردن تغییرات
+        function formatChange(change) {
+            const sign = parseFloat(change) >= 0 ? '+' : '';
+            return `${sign}${change}%`;
+        }
+
+        // فراخوانی API
+        async function fetchGoldData() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const chartWrapper = document.querySelector('.chart-wrapper');
+            const statsContainer = document.getElementById('statsContainer');
+
+            try {
+                const response = await fetch('https://api.wallgold.ir/api/v1/chart?symbol=GLD_18C_750TMN&chartType=DAILY');
+                
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت داده‌ها');
+                }
+
+                const result = await response.json();
+
+                if (!result.success || !result.result || !result.result.chart) {
+                    throw new Error('داده‌های دریافتی نامعتبر است');
+                }
+
+                const chartData = result.result.chart;
+                const data = chartData.data || [];
+                const aggregate = chartData.aggregate || {};
+
+                if (data.length === 0) {
+                    throw new Error('داده‌ای برای نمایش وجود ندارد');
+                }
+
+                // مخفی کردن loading
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'none';
+                chartWrapper.style.display = 'block';
+                statsContainer.style.display = 'flex';
+
+                // قیمت حال حاضر = آخرین کندل (اولین آیتم در پاسخ API)
+                const currentPrice = parseFloat(data[0].close);
+                const currentPriceWrap = document.getElementById('currentPriceWrap');
+                const currentPriceEl = document.getElementById('currentPrice');
+                if (currentPriceWrap && currentPriceEl) {
+                    currentPriceWrap.style.display = 'block';
+                    currentPriceEl.textContent = formatNumber(currentPrice) + ' تومان';
+                }
+
+                // آماده‌سازی داده‌ها برای چارت
+                // معکوس کردن آرایه برای نمایش از قدیم به جدید
+                const reversedData = [...data].reverse();
+                
+                const labels = reversedData.map(item => formatDate(item.date));
+                const prices = reversedData.map(item => parseFloat(item.close));
+
+                // نمایش آمار
+                document.getElementById('lowPrice').textContent = formatNumber(aggregate.low) + ' تومان';
+                document.getElementById('highPrice').textContent = formatNumber(aggregate.high) + ' تومان';
+                
+                const changeValue = aggregate.change || '0';
+                const changeEl = document.getElementById('change');
+                changeEl.textContent = formatChange(changeValue);
+                if (parseFloat(changeValue) >= 0) {
+                    changeEl.className = 'stat-value high';
+                } else {
+                    changeEl.className = 'stat-value low';
+                }
+
+                // ایجاد یا به‌روزرسانی چارت
+                const ctx = document.getElementById('myChart');
+                
+                if (myChart) {
+                    myChart.destroy();
+                }
+
+                var palette = {
+                    gold: '#FACC15',
+                    goldSoft: 'rgba(250, 204, 21, 0.12)',
+                    text: '#F1F5F9',
+                    muted: '#94A3B8',
+                    grid: 'rgba(248, 250, 252, 0.06)',
+                    border: 'rgba(250, 204, 21, 0.35)',
+                    tooltipBg: 'rgba(15, 23, 42, 0.95)'
+                };
+
+                myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'قیمت طلا (تومان)',
+                            data: prices,
+                            borderColor: palette.gold,
+                            backgroundColor: palette.goldSoft,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: palette.gold,
+                            pointBorderColor: 'rgba(15, 23, 42, 0.8)',
+                            pointBorderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#FDE047',
+                            pointHoverBorderColor: palette.gold,
+                            pointHoverBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    color: palette.text,
+                                    font: {
+                                        size: 13,
+                                        weight: '500'
+                                    },
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: palette.tooltipBg,
+                                titleColor: palette.gold,
+                                bodyColor: palette.text,
+                                padding: 14,
+                                titleFont: {
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                borderColor: palette.border,
+                                borderWidth: 1,
+                                cornerRadius: 10,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'قیمت: ' + formatNumber(context.parsed.y) + ' تومان';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: palette.grid,
+                                    lineWidth: 1
+                                },
+                                ticks: {
+                                    color: palette.muted,
+                                    font: {
+                                        size: 11
+                                    },
+                                    padding: 10,
+                                    callback: function(value) {
+                                        return formatNumber(value);
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: palette.muted,
+                                    font: {
+                                        size: 11
+                                    },
+                                    padding: 10,
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                errorEl.textContent = 'خطا: ' + error.message;
+                console.error('Error fetching gold data:', error);
+            }
+        }
+
+        // فراخوانی تابع هنگام بارگذاری صفحه
+        fetchGoldData();
+    </script>
+</body>
+</html>
