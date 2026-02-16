@@ -312,6 +312,20 @@ body {
   line-height: 1.4;
 }
 
+.chart-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: #facc15;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
+.chart-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
