@@ -8,6 +8,7 @@ const sources = [
     name: "WallGold (طلای ۱۸)",
     description: "قیمت خرید هر گرم طلای ۱۸ عیار",
     currency: "تومان",
+    chartLink: "charts/tala(wallex).html",
     url: "https://api.wallgold.ir/api/v1/price?symbol=GLD_18C_750TMN&side=buy",
     parseResponse: (data) => {
       if (!data || !data.result) throw new Error("ساختار پاسخ نامعتبر");
@@ -150,6 +151,7 @@ function createCardElement(source) {
     <div class="description" style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem; opacity: 0.8;">
       ${source.description || ""}
     </div>
+    ${source.chartLink ? `<a href="${source.chartLink}" class="chart-link" target="_blank" rel="noopener">مشاهده چارت قیمت روزانه</a>` : ""}
   `;
 
   return card;
